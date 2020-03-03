@@ -2,6 +2,7 @@ aio-pika==6.5.2
 aiormq==3.2.1
 idna==2.9
 joblib==0.14.1
+json-logging==1.0.5
 multidict==4.7.5
 nltk==3.4.5
 numpy==1.18.1

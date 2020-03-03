@@ -6,6 +6,9 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
 
 import config
+import logging
+
+logger = logging.getLogger("spamd.learn")
 
 
 class DataLoaderFactory():
@@ -67,9 +70,9 @@ class SpamFilter():
         self.classifier.fit(X_train, y_train)
 
         pred = self.classifier.predict(X_train)
-        print("Accuracy on train:", accuracy_score(y_train, pred))
+        logger.info("filter accuracy on train set is {0}".format(accuracy_score(y_train, pred)))
         pred_test = self.classifier.predict(X_test)
-        print("Accuracy on tests:", accuracy_score(y_test, pred_test))
+        logger.info("filter accuracy on test set is {0}".format(accuracy_score(y_test, pred_test)))
 
     def is_spam(self, msg_texts):
         msg_vector = self.vectorizer.transform(msg_texts)

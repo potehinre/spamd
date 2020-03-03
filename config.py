@@ -5,10 +5,14 @@ import yaml
 import os.path
 
 DEFAULT_CONFIG_PATH = "config.yaml"
+DEFAULT_LOG_FORMAT_STRING = "%(asctime)s %(levelname)s %(message)s"
 
 EMAILS_SMALL_DATASET = "emails_small"
 COUNT_VECTORIZER = "CountVectorizer"
 MULTINOMIAL_NB_CLASSIFIER = "MultinomialNB"
+
+LOGGING_OUTPUT_SYSLOG = "syslog"
+LOGGING_FORMAT_JSON = "json"
 
 DEFAULT_CONFIG = {
     "Learning": {
@@ -28,6 +32,14 @@ DEFAULT_CONFIG = {
     "Alert": {
         "url": "http://127.0.0.1:8000/spam",
     },
+    "Logging": {
+        "output": "console",
+        "format": "text",
+        "format_string": DEFAULT_LOG_FORMAT_STRING,
+        "level": "info",
+        "syslog_address": "/var/run/syslog",
+        "syslog_facility": "local1",
+    },
 }
 
 flag2config = {
@@ -40,6 +52,12 @@ flag2config = {
     "rabbitmq_queue_name": ("RabbitMQ", "queue_name"),
     "filtering_batchsize": ("Filtering", "batchsize"),
     "alert_url": ("Alert", "url"),
+    "logging_output": ("Logging", "output"),
+    "logging_format": ("Logging", "format"),
+    "logging_format_string": ("Logging", "format_string"),
+    "logging_level": ("Logging", "level"),
+    "logging_syslog_address": ("Logging", "syslog_address"),
+    "logging_syslog_facility": ("Logging", "syslog_facility"),
 }
 
 typed_fields = {
@@ -82,6 +100,24 @@ def parse_arguments():
     parser.add_argument("--rabbitmq_queue_name", action="store",
                         default=DEFAULT_CONFIG["RabbitMQ"]["queue_name"],
                         help="queue name with messages for spam filtering")
+    parser.add_argument("--logging_output", action="store",
+                        default=DEFAULT_CONFIG["Logging"]["output"],
+                        help="logging output, could be (console, syslog)")
+    parser.add_argument("--logging_format", action="store",
+                        default=DEFAULT_CONFIG["Logging"]["format"],
+                        help="logging format, could be (json, text)")
+    parser.add_argument("--logging_format_string", action="store",
+                        default=DEFAULT_CONFIG["Logging"]["format_string"],
+                        help="logging format string, would be applied if text format specified")
+    parser.add_argument("--logging_level", action="store",
+                        default=DEFAULT_CONFIG["Logging"]["level"],
+                        help="logging level")
+    parser.add_argument("--logging_syslog_address", action="store",
+                        default=DEFAULT_CONFIG["Logging"]["syslog_address"],
+                        help="syslog address, would be applied if output is syslog")
+    parser.add_argument("--logging_syslog_facility", action="store",
+                        default=DEFAULT_CONFIG["Logging"]["syslog_facility"],
+                        help="syslog facility, would be applied if output is syslog")
 
     parser.add_argument("--learn", action="store_true",
                         help="perform learning process, dump a matrix")
@@ -127,17 +163,21 @@ def write_config(path):
 
 def init():
     args = parse_arguments()
+    if args.save_config:
+        write_config(args.config_path)
+        print(f"config saved at {args.config_path}")
+        sys.exit(0)
     config = None
     if os.path.isfile(args.config_path):
         with open(args.config_path, 'r') as stream:
             try:
                 config = yaml.safe_load(stream)
             except yaml.YAMLError as e:
-                print("Exc happened while reading config file:", e)
+                print("error parsing config file:", e)
+                print("config from the flags will be used.")
             else:
                 apply_config_from_file(config)
+    else:
+        print(f"cant find config at {args.config_path}, config from the flags will be used")
     apply_flags(args)
-    if args.save_config:
-        write_config(args.config_path)
-        sys.exit(0)
     return args

@@ -1,5 +1,9 @@
 import asyncio
+import logging
 from aio_pika import connect_robust
+
+
+logger = logging.getLogger('spamd.server')
 
 
 async def serve(loop, spam_filter, connstring, queue_name, batch_size):
@@ -11,13 +15,13 @@ async def serve(loop, spam_filter, connstring, queue_name, batch_size):
     async with queue.iterator() as queue_iter:
         async for message in queue_iter:
             async with message.process():
-                print("RECEIVED MESSAGE:", str(message.body))
+                logger.info("received a message for filtering: {0}".format(str(message.body)))
                 batch.append(str(message.body))
                 if len(batch) >= batch_size:
                     is_spams = spam_filter.is_spam(batch)
                     for i, is_spam in enumerate(is_spams):
                         if is_spam:
-                            print("msg is spam:", batch[i])
+                            logger.info("message is a spam: {0}".format(batch[i]))
                     batch = []
 
                 if queue.name in message.body.decode():
