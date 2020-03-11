@@ -1,5 +1,9 @@
 aio-pika==6.5.2
+aiohttp==3.6.2
 aiormq==3.2.1
+async-timeout==3.0.1
+attrs==19.3.0
+chardet==3.0.4
 idna==2.9
 joblib==0.14.1
 json-logging==1.0.5

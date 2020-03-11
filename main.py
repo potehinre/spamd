@@ -128,7 +128,8 @@ if __name__ == "__main__":
         server.start(spam_filter=spam_filter,
                     connstring=rabbitmq_cfg["connstring"],
                     queue_name=rabbitmq_cfg["queue_name"],
-                    batch_size=config.Config["Filtering"]["batchsize"])
+                    batch_size=config.Config["Filtering"]["batchsize"],
+                    alert_url=config.Config["Alert"]["url"])
     except Exception as e:
         logger.error("error during listening the queue: {0}".format(e))
         raise
