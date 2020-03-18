@@ -14,11 +14,14 @@ def check_message(msg):
         raise ValueError("message should contain owner_id key")
     if 'text' not in dct:
         raise ValueError("message should contain text key")
-    return {"owner_id": dct["owner_id"], "text": dct["text"]}
+    return {"owner_id": dct["owner_id"], "text": dct["text"],
+            "id": dct.get("id", ""), "source": dct.get("source", "")}
 
 
-async def alert(url, batch):
-    async with aiohttp.ClientSession() as session:
+async def alert(url, token, batch):
+    headers_dict = {"Authorization": "Token {}".format(token),
+               "Content-Type": "application/json"}
+    async with aiohttp.ClientSession(headers=headers_dict) as session:
         async with session.post(url, json=batch) as resp:
             text = await resp.text()
             if resp.status not in (200, 201):
@@ -29,7 +32,7 @@ async def alert(url, batch):
                     url, resp.status, text))
 
 
-async def serve(loop, spam_filter, connstring, queue_name, batch_size, alert_url):
+async def serve(loop, spam_filter, connstring, queue_name, batch_size, alert_url, token):
     connection = await connect_robust(connstring=connstring, loop=loop)
     channel = await connection.channel()
     queue = await channel.declare_queue(queue_name)
@@ -51,17 +54,17 @@ async def serve(loop, spam_filter, connstring, queue_name, batch_size, alert_url
                     for i, is_spam in enumerate(is_spams):
                         if is_spam:
                             logger.info("message is a spam: {0}".format(batch[i]['text']))
-                    await alert(alert_url, batch)
+                    await alert(alert_url, token, batch)
                     batch = []
 
                 if queue.name in message.body.decode():
                     break
 
 
-def start(spam_filter, connstring, queue_name, batch_size, alert_url):
+def start(spam_filter, connstring, queue_name, batch_size, alert_url, alert_token):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(serve(loop,
                                   spam_filter, connstring,
                                   queue_name, batch_size,
-                                  alert_url))
+                                  alert_url, alert_token))
     loop.close()

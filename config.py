@@ -31,6 +31,7 @@ DEFAULT_CONFIG = {
     },
     "Alert": {
         "url": "http://127.0.0.1:8000/spam",
+        "token": "29925f9f740a5567b70325419f420a9723b5b37d",
     },
     "Logging": {
         "output": "console",
@@ -52,6 +53,7 @@ flag2config = {
     "rabbitmq_queue_name": ("RabbitMQ", "queue_name"),
     "filtering_batchsize": ("Filtering", "batchsize"),
     "alert_url": ("Alert", "url"),
+    "alert_token": ("Alert", "token"),
     "logging_output": ("Logging", "output"),
     "logging_format": ("Logging", "format"),
     "logging_format_string": ("Logging", "format_string"),
@@ -94,6 +96,9 @@ def parse_arguments():
     parser.add_argument("--alert_url", action="store",
                         default=DEFAULT_CONFIG["Alert"]["url"],
                         help="url to alert about spam message")
+    parser.add_argument("--alert_token", action="store",
+                        default=DEFAULT_CONFIG["Alert"]["token"],
+                        help="auth token to alert about spam message")
     parser.add_argument("--rabbitmq_connstring", action="store",
                         default=DEFAULT_CONFIG["RabbitMQ"]["connstring"],
                         help="url to alert about spam message")
