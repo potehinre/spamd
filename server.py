@@ -35,7 +35,7 @@ async def alert(url, token, batch):
 async def serve(loop, spam_filter, connstring, queue_name, batch_size, alert_url, token):
     connection = await connect_robust(connstring=connstring, loop=loop)
     channel = await connection.channel()
-    queue = await channel.declare_queue(queue_name)
+    queue = await channel.declare_queue(queue_name, durable=True)
 
     batch = []
     async with queue.iterator() as queue_iter:
