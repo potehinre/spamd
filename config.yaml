@@ -1,0 +1,21 @@
+Alert:
+  token: 29925f9f740a5567b70325419f420a9723b5b37d
+  url: http://localhost/en/api/2.0/users/suss/
+Filtering:
+  batchsize: 10
+Learning:
+  classifier: MultinomialNB
+  dataset: emails_small
+  dataset_path: emails.csv
+  filter_path: spam_filter
+  vectorizer: CountVectorizer
+Logging:
+  format: text
+  format_string: '%(asctime)s %(levelname)s %(message)s'
+  level: info
+  output: console
+  syslog_address: /var/run/syslog
+  syslog_facility: local1
+RabbitMQ:
+  connstring: amqp://guest:guest@127.0.0.1
+  queue_name: spam
