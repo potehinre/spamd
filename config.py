@@ -27,10 +27,10 @@ DEFAULT_CONFIG = {
         "queue_name": "spam",
     },
     "Filtering": {
-        "batchsize": 100,
+        "batchsize": 10,
     },
     "Alert": {
-        "url": "http://127.0.0.1:8000/spam",
+        "url": "http://localhost/en/api/2.0/users/suss/",
         "token": "29925f9f740a5567b70325419f420a9723b5b37d",
     },
     "Logging": {
