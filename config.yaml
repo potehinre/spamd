@@ -5,8 +5,8 @@ Filtering:
   batchsize: 10
 Learning:
   classifier: MultinomialNB
-  dataset: emails_small
-  dataset_path: emails.csv
+  dataset: sms
+  dataset_path: smsspam.csv
   filter_path: spam_filter
   vectorizer: CountVectorizer
 Logging:

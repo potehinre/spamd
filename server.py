@@ -2,10 +2,19 @@ import asyncio
 import logging
 import json
 import aiohttp
+import pycld2 as cld2
 from aio_pika import connect_robust
 
 
 logger = logging.getLogger('spamd.server')
+
+
+class NotEnglishLanguageError(BaseException):
+    def __init__(self, lang):
+        self.lang = lang
+
+    def __str__(self):
+        return self.lang
 
 
 def check_message(msg):
@@ -14,6 +23,10 @@ def check_message(msg):
         raise ValueError("message should contain owner_id key")
     if 'text' not in dct:
         raise ValueError("message should contain text key")
+    isReliable, textBytesFound, details = cld2.detect(dct["text"])
+    lang = details[0][1]
+    if lang != "en":
+        raise NotEnglishLanguageError(lang)
     return {"owner_id": dct["owner_id"], "text": dct["text"],
             "id": dct.get("id", ""), "source": dct.get("source", "")}
 
@@ -45,6 +58,9 @@ async def serve(loop, spam_filter, connstring, queue_name, batch_size, alert_url
                 msg = None
                 try:
                     msg = check_message(message.body)
+                except NotEnglishLanguageError as e:
+                    logger.warning("message language is not english, excluding it from filtering {0} lang is {1}".format(str(message.body), str(e)))
+                    continue
                 except Exception as e:
                     logger.error("incorrect message format {0}: {1}".format(str(message.body), str(e)))
                     continue

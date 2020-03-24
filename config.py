@@ -8,6 +8,7 @@ DEFAULT_CONFIG_PATH = "config.yaml"
 DEFAULT_LOG_FORMAT_STRING = "%(asctime)s %(levelname)s %(message)s"
 
 EMAILS_SMALL_DATASET = "emails_small"
+SMS_DATASET = "sms"
 COUNT_VECTORIZER = "CountVectorizer"
 MULTINOMIAL_NB_CLASSIFIER = "MultinomialNB"
 
@@ -16,10 +17,10 @@ LOGGING_FORMAT_JSON = "json"
 
 DEFAULT_CONFIG = {
     "Learning": {
-        "dataset": EMAILS_SMALL_DATASET,
+        "dataset": SMS_DATASET,
         "vectorizer": COUNT_VECTORIZER,
         "classifier": MULTINOMIAL_NB_CLASSIFIER,
-        "dataset_path": "emails.csv",
+        "dataset_path": "smsspam.csv",
         "filter_path": "spam_filter"
     },
     "RabbitMQ": {

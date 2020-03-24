@@ -7,6 +7,7 @@ RUN apt-get install -y \
 ADD *.py /app/
 ADD requirements.txt /app/
 ADD emails.csv /app/
+ADD smsspam.csv /app/
 ADD config.yaml /app/
 WORKDIR /app
 RUN pip3 install -r requirements.txt

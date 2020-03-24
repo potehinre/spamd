@@ -20,6 +20,8 @@ class DataLoaderFactory():
     def data_loader(self):
         if self.name == config.EMAILS_SMALL_DATASET:
             return EmailsSmallDataLoader(self.path)
+        elif self.name == config.SMS_DATASET:
+            return SMSDataLoader(self.path)
         else:
             raise ValueError(f"Unknown data loader: {self.name}")
 
@@ -33,7 +35,19 @@ class EmailsSmallDataLoader():
         return self.df["text"]
 
     def get_marks(self):
-        return self.df["spam"]
+        return self.df["spam"] == 1
+
+
+class SMSDataLoader():
+    def __init__(self, path):
+        self.df = pd.read_csv(path, sep="\t", header=None)
+        self.df.drop_duplicates(inplace=True)
+
+    def get_texts(self):
+        return self.df[1]
+
+    def get_marks(self):
+        return self.df[0] == 'spam'
 
 
 class LearnFabric():
